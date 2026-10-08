@@ -1,71 +1,290 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOVA AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA AI</title>
 
-```
 <style>
-    * {
-        box-sizing: border-box;
-    }
+*{box-sizing:border-box}
 
-    body {
-        margin: 0;
-        height: 100vh;
-        background:
-            radial-gradient(circle at 50% 45%, #10254a 0%, #07101f 30%, #030711 70%);
-        color: #ffffff;
-        font-family: Arial, Helvetica, sans-serif;
-        overflow: hidden;
-    }
+body{
+margin:0;
+height:100vh;
+overflow:hidden;
+font-family:Arial,sans-serif;
+color:white;
+background:
+radial-gradient(circle at 50% 45%,#12315c 0%,#071224 35%,#02050b 75%);
+}
 
-    .app {
-        display: flex;
-        width: 100%;
-        height: 100vh;
-    }
+.app{
+display:flex;
+height:100vh;
+}
 
-    /* SIDEBAR */
+.sidebar{
+width:250px;
+padding:25px;
+background:rgba(3,8,18,.95);
+border-right:1px solid rgba(80,160,255,.2);
+display:flex;
+flex-direction:column;
+}
 
-    .sidebar {
-        width: 250px;
-        background: rgba(5, 10, 22, 0.94);
-        border-right: 1px solid rgba(70, 130, 220, 0.2);
-        padding: 25px;
-        display: flex;
-        flex-direction: column;
-    }
+.logo{
+font-size:30px;
+font-weight:bold;
+letter-spacing:7px;
+text-shadow:0 0 25px #258cff;
+margin-bottom:40px;
+}
 
-    .logo {
-        font-size: 30px;
-        font-weight: 700;
-        letter-spacing: 7px;
-        margin-bottom: 40px;
-        text-shadow: 0 0 20px rgba(40, 130, 255, 0.8);
-    }
+.new-chat{
+padding:14px;
+border-radius:12px;
+border:1px solid #286dba;
+background:rgba(20,80,150,.25);
+color:white;
+cursor:pointer;
+font-size:15px;
+}
 
-    .new-chat {
-        width: 100%;
-        padding: 14px;
-        border: 1px solid rgba(40, 130, 255, 0.5);
-        background: rgba(20, 60, 120, 0.25);
-        color: white;
-        border-radius: 12px;
-        cursor: pointer;
-        font-size: 15px;
-        transition: 0.2s;
-    }
+.new-chat:hover{
+background:rgba(30,110,210,.4);
+}
 
-    .new-chat:hover {
-        background: rgba(30, 100, 200, 0.4);
-        border-color: #4b9cff;
-        box-shadow: 0 0 20px rgba(40, 130, 255, 0.2);
-    }
+.info{
+margin-top:auto;
+color:#687995;
+font-size:12px;
+line-height:1.7;
+}
 
-    .sidebar-info {
-        margin-top: auto;
-        color: #60708a;
-```
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+.topbar{
+height:70px;
+padding:0 30px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid rgba(80,150,255,.15);
+}
+
+.title{
+font-size:18px;
+letter-spacing:3px;
+font-weight:bold;
+}
+
+.status{
+color:#65ff9f;
+font-size:13px;
+}
+
+.dot{
+display:inline-block;
+width:9px;
+height:9px;
+border-radius:50%;
+background:#39ff88;
+box-shadow:0 0 15px #39ff88;
+margin-right:8px;
+}
+
+.center{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+
+.core{
+width:230px;
+height:230px;
+border-radius:50%;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+margin-bottom:35px;
+}
+
+.core:before{
+content:"";
+position:absolute;
+inset:0;
+border-radius:50%;
+border:1px solid #3b9cff;
+box-shadow:
+0 0 30px rgba(40,140,255,.7),
+0 0 90px rgba(40,140,255,.3),
+inset 0 0 40px rgba(40,140,255,.3);
+animation:pulse 3s infinite;
+}
+
+.core:after{
+content:"";
+position:absolute;
+width:145px;
+height:145px;
+border-radius:50%;
+background:radial-gradient(circle,#9bd7ff,#278dff 25%,#061a3c 65%,transparent 72%);
+box-shadow:0 0 45px #238cff;
+animation:pulse 2s infinite;
+}
+
+.coreText{
+z-index:2;
+font-size:27px;
+font-weight:bold;
+letter-spacing:6px;
+text-shadow:0 0 25px #5bb8ff;
+}
+
+.heading{
+font-size:48px;
+letter-spacing:8px;
+margin:0;
+}
+
+.subtitle{
+margin-top:10px;
+color:#71829d;
+}
+
+.input{
+width:min(850px,90%);
+display:flex;
+gap:12px;
+margin-top:35px;
+}
+
+input{
+flex:1;
+padding:17px 20px;
+border-radius:14px;
+border:1px solid #315d8d;
+background:rgba(3,10,23,.8);
+color:white;
+font-size:16px;
+outline:none;
+}
+
+button.send{
+padding:0 28px;
+border:0;
+border-radius:14px;
+background:linear-gradient(135deg,#1877ff,#42b5ff);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.response{
+margin-top:20px;
+color:#a9bad3;
+}
+
+@keyframes pulse{
+0%,100%{transform:scale(.96);opacity:.75}
+50%{transform:scale(1.04);opacity:1}
+}
+
+@media(max-width:700px){
+.sidebar{display:none}
+.heading{font-size:34px}
+.input{flex-direction:column}
+.send{padding:15px!important}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<aside class="sidebar">
+<div class="logo">NOVA</div>
+
+<button class="new-chat" onclick="newChat()">
++ New Conversation
+</button>
+
+<div class="info">
+NOVA AI<br>
+Online Intelligence System<br><br>
+Web Edition v1.0
+</div>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+<div class="title">NOVA AI</div>
+
+<div class="status">
+<span class="dot"></span>ONLINE
+</div>
+</header>
+
+<section class="center">
+
+<div class="core">
+<div class="coreText">NOVA</div>
+</div>
+
+<h1 class="heading">NOVA</h1>
+
+<div class="subtitle">
+Your personal online intelligence system
+</div>
+
+<div class="input">
+<input id="message" placeholder="Talk to NOVA..." autocomplete="off">
+
+<button class="send" onclick="sendMessage()">
+SEND
+</button>
+</div>
+
+<div class="response" id="response">
+Ready.
+</div>
+
+</section>
+
+</main>
+</div>
+
+<script>
+const input=document.getElementById("message");
+const response=document.getElementById("response");
+
+function sendMessage(){
+const message=input.value.trim();
+if(!message)return;
+
+response.textContent="NOVA received: "+message;
+input.value="";
+}
+
+function newChat(){
+input.value="";
+response.textContent="New conversation started.";
+input.focus();
+}
+
+input.addEventListener("keydown",function(e){
+if(e.key==="Enter")sendMessage();
+});
+</script>
+
+</body>
+</html>
