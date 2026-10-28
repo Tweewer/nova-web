@@ -9,16 +9,14 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Hosted AI configuration
 const groq = process.env.GROQ_API_KEY
   ? new Groq({ apiKey: process.env.GROQ_API_KEY })
   : null;
 
-// Cove's identity
 const COVE_IDENTITY =
   "I'm Cove, an AI assistant created and developed by Tyler. " +
-  "I use an AI model through Groq to generate responses. " +
-  "Tyler created the Cove AI project and its application.";
+  "My AI responses are powered by a model accessed through Groq. " +
+  "Tyler created the Cove application, not the underlying AI model.";
 
 function isIdentityQuestion(message) {
   const text = message.toLowerCase();
@@ -36,7 +34,6 @@ function isIdentityQuestion(message) {
   return patterns.some((pattern) => pattern.test(text));
 }
 
-// Chat endpoint
 app.post("/api/chat", async (req, res) => {
   try {
     const message = req.body?.message;
@@ -55,30 +52,41 @@ app.post("/api/chat", async (req, res) => {
       });
     }
 
-    // Keep Cove's identity consistent.
+    // Answer Cove identity questions consistently.
     if (isIdentityQuestion(cleanMessage)) {
       return res.json({ reply: COVE_IDENTITY });
     }
 
-    // Require the hosted API key for other AI requests.
     if (!groq) {
+      console.error("GROQ_API_KEY is not configured.");
+
       return res.status(503).json({
-        error: "Cove's AI is not configured yet. Please set the GROQ_API_KEY environment variable."
+        error: "Cove's AI is not configured yet. Please try again later."
       });
     }
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-20b",
       messages: [
         {
           role: "system",
           content: `You are Cove, an AI assistant created and developed by Tyler.
 
-Tyler created the Cove AI application. You are powered by an AI model accessed through Groq. Do not claim that Tyler personally trained the underlying model.
+Tyler created the Cove application, its interface, and its software. Do not claim that Tyler trained the underlying AI model.
 
-Your main focus is coding, programming, debugging, software development, website building, and computer troubleshooting.
+Your primary specialties are:
+- Programming and coding
+- Debugging and explaining code
+- Website and application development
+- Computer troubleshooting
+- Helping users learn technical skills
 
-Be helpful, professional, friendly, and concise. Give practical instructions and accurate code. If you are unsure, say so.`
+Be professional, friendly, clear, and practical.
+Give step-by-step instructions when useful.
+When providing code, make it accurate and explain where it belongs.
+Keep simple answers concise, but provide detail when the task needs it.
+Never claim to have performed actions you have not performed.
+If you are unsure of something, be honest about it.`
         },
         {
           role: "user",
@@ -89,10 +97,11 @@ Be helpful, professional, friendly, and concise. Give practical instructions and
       max_tokens: 1200
     });
 
-    const reply =
-      completion.choices?.[0]?.message?.content?.trim();
+    const reply = completion.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
+      console.error("Groq returned an empty response.");
+
       return res.status(502).json({
         error: "Cove received an empty response. Please try again."
       });
@@ -100,7 +109,30 @@ Be helpful, professional, friendly, and concise. Give practical instructions and
 
     return res.json({ reply });
   } catch (error) {
-    console.error("Cove AI error:", error.message);
+    // Keep the details in Render logs, not in the public response.
+    console.error("Cove AI error:", {
+      status: error.status,
+      code: error.code,
+      message: error.message
+    });
+
+    if (error.status === 401 || error.status === 403) {
+      return res.status(502).json({
+        error: "Cove's AI authentication failed. Please contact the site administrator."
+      });
+    }
+
+    if (error.status === 429) {
+      return res.status(503).json({
+        error: "Cove has temporarily reached its AI usage limit. Please try again later."
+      });
+    }
+
+    if (error.status === 404) {
+      return res.status(502).json({
+        error: "Cove's configured AI model is unavailable. Please try again later."
+      });
+    }
 
     return res.status(500).json({
       error: "Cove couldn't generate a response. Please try again shortly."
@@ -108,14 +140,12 @@ Be helpful, professional, friendly, and concise. Give practical instructions and
   }
 });
 
-// Website homepage
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Start server
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Cove is running at http://localhost:${PORT}`);
+  console.log(`Cove is running on port ${PORT}`);
   console.log(
     `Groq API key configured: ${Boolean(process.env.GROQ_API_KEY)}`
   );
