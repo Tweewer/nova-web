@@ -1,16 +1,21 @@
 {
-  "name": "nova-web",
+  "name": "cove-ai",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Cove AI coding assistant website",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "echo \"No tests configured yet\""
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cove",
+    "ai",
+    "coding-assistant"
+  ],
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "groq-sdk": "^1.6.0"
   }
 }

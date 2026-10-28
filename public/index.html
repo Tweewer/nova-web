@@ -1,290 +1,832 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NOVA AI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Cove AI is your coding companion for programming, debugging, and computer troubleshooting.">
+  <title>Cove AI — Your coding companion</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f9fc;
+      --border: #e7e9f0;
+      --text: #191b24;
+      --muted: #777d8d;
+      --blue: #3569e8;
+      --blue-dark: #2455ce;
+      --blue-light: #edf2ff;
+    }
 
-body{
-margin:0;
-height:100vh;
-overflow:hidden;
-font-family:Arial,sans-serif;
-color:white;
-background:
-radial-gradient(circle at 50% 45%,#12315c 0%,#071224 35%,#02050b 75%);
-}
+    * {
+      box-sizing: border-box;
+    }
 
-.app{
-display:flex;
-height:100vh;
-}
+    body {
+      margin: 0;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: Inter, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-.sidebar{
-width:250px;
-padding:25px;
-background:rgba(3,8,18,.95);
-border-right:1px solid rgba(80,160,255,.2);
-display:flex;
-flex-direction:column;
-}
+    button, input {
+      font: inherit;
+    }
 
-.logo{
-font-size:30px;
-font-weight:bold;
-letter-spacing:7px;
-text-shadow:0 0 25px #258cff;
-margin-bottom:40px;
-}
+    button {
+      cursor: pointer;
+    }
 
-.new-chat{
-padding:14px;
-border-radius:12px;
-border:1px solid #286dba;
-background:rgba(20,80,150,.25);
-color:white;
-cursor:pointer;
-font-size:15px;
-}
+    button:focus-visible, input:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 3px;
+    }
 
-.new-chat:hover{
-background:rgba(30,110,210,.4);
-}
+    .app {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
 
-.info{
-margin-top:auto;
-color:#687995;
-font-size:12px;
-line-height:1.7;
-}
+    /* Sidebar */
 
-.main{
-flex:1;
-display:flex;
-flex-direction:column;
-}
+    .sidebar {
+      width: 255px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 17px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+    }
 
-.topbar{
-height:70px;
-padding:0 30px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-border-bottom:1px solid rgba(80,150,255,.15);
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 9px;
+      margin-bottom: 34px;
+    }
 
-.title{
-font-size:18px;
-letter-spacing:3px;
-font-weight:bold;
-}
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--blue);
+      color: white;
+      font-size: 24px;
+      font-weight: 750;
+    }
 
-.status{
-color:#65ff9f;
-font-size:13px;
-}
+    .brand-name {
+      font-size: 25px;
+      font-weight: 750;
+      letter-spacing: -1.2px;
+    }
 
-.dot{
-display:inline-block;
-width:9px;
-height:9px;
-border-radius:50%;
-background:#39ff88;
-box-shadow:0 0 15px #39ff88;
-margin-right:8px;
-}
+    .brand-ai {
+      margin-left: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
 
-.center{
-flex:1;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-}
+    .new-chat {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #dfe3ed;
+      border-radius: 11px;
+      background: white;
+      color: var(--text);
+      text-align: left;
+      transition: background .2s, border-color .2s;
+    }
 
-.core{
-width:230px;
-height:230px;
-border-radius:50%;
-position:relative;
-display:flex;
-align-items:center;
-justify-content:center;
-margin-bottom:35px;
-}
+    .new-chat:hover {
+      background: var(--blue-light);
+      border-color: #c9d6fb;
+    }
 
-.core:before{
-content:"";
-position:absolute;
-inset:0;
-border-radius:50%;
-border:1px solid #3b9cff;
-box-shadow:
-0 0 30px rgba(40,140,255,.7),
-0 0 90px rgba(40,140,255,.3),
-inset 0 0 40px rgba(40,140,255,.3);
-animation:pulse 3s infinite;
-}
+    .section-label {
+      margin: 32px 10px 12px;
+      color: #969baa;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 1.5px;
+    }
 
-.core:after{
-content:"";
-position:absolute;
-width:145px;
-height:145px;
-border-radius:50%;
-background:radial-gradient(circle,#9bd7ff,#278dff 25%,#061a3c 65%,transparent 72%);
-box-shadow:0 0 45px #238cff;
-animation:pulse 2s infinite;
-}
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px;
+      border-radius: 9px;
+      color: #626879;
+      font-size: 13px;
+      cursor: pointer;
+    }
 
-.coreText{
-z-index:2;
-font-size:27px;
-font-weight:bold;
-letter-spacing:6px;
-text-shadow:0 0 25px #5bb8ff;
-}
+    .nav-item.active {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      font-weight: 650;
+    }
 
-.heading{
-font-size:48px;
-letter-spacing:8px;
-margin:0;
-}
+    .nav-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 16px;
+    }
 
-.subtitle{
-margin-top:10px;
-color:#71829d;
-}
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 17px 8px 0;
+      border-top: 1px solid var(--border);
+    }
 
-.input{
-width:min(850px,90%);
-display:flex;
-gap:12px;
-margin-top:35px;
-}
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-input{
-flex:1;
-padding:17px 20px;
-border-radius:14px;
-border:1px solid #315d8d;
-background:rgba(3,10,23,.8);
-color:white;
-font-size:16px;
-outline:none;
-}
+    .avatar {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #e5ebff;
+      color: var(--blue-dark);
+      font-weight: 750;
+    }
 
-button.send{
-padding:0 28px;
-border:0;
-border-radius:14px;
-background:linear-gradient(135deg,#1877ff,#42b5ff);
-color:white;
-font-weight:bold;
-cursor:pointer;
-}
+    .profile-name {
+      font-size: 13px;
+      font-weight: 650;
+    }
 
-.response{
-margin-top:20px;
-color:#a9bad3;
-}
+    .profile-subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
 
-@keyframes pulse{
-0%,100%{transform:scale(.96);opacity:.75}
-50%{transform:scale(1.04);opacity:1}
-}
+    /* Main layout */
 
-@media(max-width:700px){
-.sidebar{display:none}
-.heading{font-size:34px}
-.input{flex-direction:column}
-.send{padding:15px!important}
-}
-</style>
+    .main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 66px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: #d99b34;
+    }
+
+    .status-dot.ready {
+      background: #2ca66b;
+    }
+
+    .status-dot.error {
+      background: #d9534f;
+    }
+
+    /* Chat area */
+
+    .chat-area {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 30px 23px;
+      scroll-behavior: smooth;
+    }
+
+    .welcome {
+      width: min(690px, 100%);
+      margin: 5vh auto 0;
+      text-align: center;
+    }
+
+    .welcome[hidden] {
+      display: none;
+    }
+
+    .welcome-icon {
+      width: 66px;
+      height: 66px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 25px;
+      border: 1px solid #dce5ff;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #eef3ff, #ffffff);
+      color: var(--blue);
+      font-size: 29px;
+      font-weight: 650;
+      box-shadow: 0 8px 30px #3569e80b;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(29px, 4vw, 43px);
+      line-height: 1.2;
+      letter-spacing: -1.8px;
+      font-weight: 760;
+    }
+
+    .welcome-description {
+      margin: 15px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .suggestions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 35px;
+      text-align: left;
+    }
+
+    .suggestion {
+      min-height: 105px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: white;
+      text-align: left;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+
+    .suggestion:hover {
+      border-color: #b9cafa;
+      background: #fafbff;
+      transform: translateY(-2px);
+    }
+
+    .suggestion-icon {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--blue);
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .suggestion strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .suggestion-description {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* Messages */
+
+    .messages {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .message {
+      max-width: 92%;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      padding: 12px 16px;
+      border-radius: 17px 17px 4px 17px;
+      background: var(--blue-light);
+      white-space: pre-wrap;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .message-label {
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .message-content {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .message-content pre {
+      max-width: 100%;
+      overflow-x: auto;
+      padding: 15px;
+      border: 1px solid #e7e9f0;
+      border-radius: 10px;
+      background: #f7f8fb;
+      color: #252938;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .message-content code {
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .thinking {
+      color: var(--muted);
+    }
+
+    .thinking::after {
+      content: "";
+      display: inline-block;
+      width: 15px;
+      animation: dots 1.2s steps(4, end) infinite;
+      content: "...";
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    @keyframes dots {
+      0% { width: 0; }
+      100% { width: 15px; }
+    }
+
+    /* Message input */
+
+    .composer-wrap {
+      flex-shrink: 0;
+      padding: 12px 22px 18px;
+      background: white;
+    }
+
+    .composer {
+      width: min(760px, 100%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 auto;
+      padding: 8px;
+      border: 1px solid #dfe3eb;
+      border-radius: 16px;
+      background: white;
+      box-shadow: 0 5px 24px #17234a08;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .composer:focus-within {
+      border-color: #9db5f7;
+      box-shadow: 0 0 0 3px #3569e810;
+    }
+
+    .composer input {
+      flex: 1;
+      width: 0;
+      min-width: 0;
+      padding: 12px;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .composer input::placeholder {
+      color: #999eab;
+    }
+
+    .send {
+      width: 43px;
+      height: 43px;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 12px;
+      background: var(--blue);
+      color: white;
+      font-size: 22px;
+      transition: background .2s, opacity .2s;
+    }
+
+    .send:hover {
+      background: var(--blue-dark);
+    }
+
+    .send:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .disclaimer {
+      width: min(760px, 100%);
+      margin: 11px auto 0;
+      color: #969baa;
+      text-align: center;
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 700px) {
+      .sidebar {
+        display: none;
+      }
+
+      .topbar {
+        height: 58px;
+        padding: 0 17px;
+      }
+
+      .chat-area {
+        padding: 24px 16px;
+      }
+
+      .welcome {
+        margin-top: 4vh;
+      }
+
+      .welcome-icon {
+        margin-bottom: 20px;
+      }
+
+      .welcome-description {
+        font-size: 13px;
+      }
+
+      .suggestions {
+        gap: 9px;
+        margin-top: 25px;
+      }
+
+      .suggestion {
+        min-height: 110px;
+        padding: 12px;
+      }
+
+      .composer-wrap {
+        padding: 10px 12px 14px;
+      }
+
+      .message {
+        max-width: 97%;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .suggestions {
+        grid-template-columns: 1fr;
+      }
+
+      .suggestion {
+        min-height: auto;
+      }
+    }
+
+    @media (max-height: 650px) {
+      .welcome {
+        margin-top: 0;
+      }
+
+      .welcome-icon {
+        margin-bottom: 14px;
+      }
+
+      .suggestions {
+        margin-top: 20px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="app">
 
-<div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">c</div>
+        <div class="brand-name">
+          cove<span class="brand-ai"> AI</span>
+        </div>
+      </div>
 
-<aside class="sidebar">
-<div class="logo">NOVA</div>
+      <button class="new-chat" id="newChat" type="button">
+        + &nbsp; New conversation
+      </button>
 
-<button class="new-chat" onclick="newChat()">
-+ New Conversation
-</button>
+      <div class="section-label">WORKSPACE</div>
 
-<div class="info">
-NOVA AI<br>
-Online Intelligence System<br><br>
-Web Edition v1.0
-</div>
-</aside>
+      <div class="nav-item active">
+        <span class="nav-icon">&lt;/&gt;</span>
+        Coding assistant
+      </div>
 
-<main class="main">
+      <div class="nav-item">
+        <span class="nav-icon">⚙</span>
+        Computer help
+      </div>
 
-<header class="topbar">
-<div class="title">NOVA AI</div>
+      <div class="sidebar-bottom">
+        <div class="profile">
+          <div class="avatar">C</div>
+          <div>
+            <div class="profile-name">Cove AI</div>
+            <div class="profile-subtitle">Local AI edition</div>
+          </div>
+        </div>
+      </div>
+    </aside>
 
-<div class="status">
-<span class="dot"></span>ONLINE
-</div>
-</header>
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title">Cove / Coding assistant</div>
 
-<section class="center">
+        <div class="status" id="status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">AI ready to connect</span>
+        </div>
+      </header>
 
-<div class="core">
-<div class="coreText">NOVA</div>
-</div>
+      <section class="chat-area" id="chatArea">
+        <div class="welcome" id="welcome">
+          <div class="welcome-icon">&lt;/&gt;</div>
 
-<h1 class="heading">NOVA</h1>
+          <h1>What are we building today?</h1>
 
-<div class="subtitle">
-Your personal online intelligence system
-</div>
+          <p class="welcome-description">
+            Your coding companion.<br>
+            Write code, solve errors and turn ideas into software.
+          </p>
 
-<div class="input">
-<input id="message" placeholder="Talk to NOVA..." autocomplete="off">
+          <div class="suggestions">
+            <button class="suggestion" type="button"
+              data-prompt="Help me write a Python program that asks for my name and greets me.">
+              <span class="suggestion-icon">&lt;/&gt;</span>
+              <strong>Write some code</strong>
+              <span class="suggestion-description">
+                Create a Python project from scratch.
+              </span>
+            </button>
 
-<button class="send" onclick="sendMessage()">
-SEND
-</button>
-</div>
+            <button class="suggestion" type="button"
+              data-prompt="Help me debug a programming error. Explain how to diagnose it step by step.">
+              <span class="suggestion-icon">⌕</span>
+              <strong>Fix a coding error</strong>
+              <span class="suggestion-description">
+                Find bugs and understand error messages.
+              </span>
+            </button>
 
-<div class="response" id="response">
-Ready.
-</div>
+            <button class="suggestion" type="button"
+              data-prompt="Help me build a modern website using HTML, CSS and JavaScript.">
+              <span class="suggestion-icon">▤</span>
+              <strong>Build a website</strong>
+              <span class="suggestion-description">
+                Turn an idea into a working web project.
+              </span>
+            </button>
 
-</section>
+            <button class="suggestion" type="button"
+              data-prompt="Help me troubleshoot a Windows PC problem. Start by asking what is going wrong.">
+              <span class="suggestion-icon">⚙</span>
+              <strong>Troubleshoot my PC</strong>
+              <span class="suggestion-description">
+                Investigate computer problems step by step.
+              </span>
+            </button>
+          </div>
+        </div>
 
-</main>
-</div>
+        <div class="messages" id="messages" aria-live="polite"></div>
+      </section>
 
-<script>
-const input=document.getElementById("message");
-const response=document.getElementById("response");
+      <footer class="composer-wrap">
+        <form class="composer" id="chatForm">
+          <input
+            id="message"
+            type="text"
+            placeholder="Ask Cove to help with your code..."
+            autocomplete="off"
+            aria-label="Message Cove"
+            maxlength="10000"
+            required
+          >
 
-function sendMessage(){
-const message=input.value.trim();
-if(!message)return;
+          <button class="send" id="sendButton" type="submit"
+            aria-label="Send message">↑</button>
+        </form>
 
-response.textContent="NOVA received: "+message;
-input.value="";
-}
+        <div class="disclaimer">
+          Cove can make mistakes. Review generated code before running it.
+          Your messages are sent to the AI service configured on your server.
+        </div>
+      </footer>
+    </main>
+  </div>
 
-function newChat(){
-input.value="";
-response.textContent="New conversation started.";
-input.focus();
-}
+  <script>
+    const form = document.getElementById("chatForm");
+    const input = document.getElementById("message");
+    const sendButton = document.getElementById("sendButton");
+    const welcome = document.getElementById("welcome");
+    const messages = document.getElementById("messages");
+    const chatArea = document.getElementById("chatArea");
+    const newChatButton = document.getElementById("newChat");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
 
-input.addEventListener("keydown",function(e){
-if(e.key==="Enter")sendMessage();
-});
-</script>
+    let busy = false;
 
+    function setStatus(state, text) {
+      statusDot.className = "status-dot";
+
+      if (state === "ready") {
+        statusDot.classList.add("ready");
+      } else if (state === "error") {
+        statusDot.classList.add("error");
+      }
+
+      statusText.textContent = text;
+    }
+
+    function addMessage(text, type, options = {}) {
+      const message = document.createElement("div");
+      message.className = "message " + type;
+
+      if (type === "assistant") {
+        const label = document.createElement("div");
+        label.className = "message-label";
+        label.textContent = "Cove";
+        message.appendChild(label);
+      }
+
+      const content = document.createElement("div");
+      content.className = "message-content";
+      content.textContent = text;
+
+      if (options.thinking) {
+        content.classList.add("thinking");
+      }
+
+      message.appendChild(content);
+      messages.appendChild(message);
+
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      return { message, content };
+    }
+
+    async function sendMessage(text) {
+      const value = (typeof text === "string" ? text : input.value).trim();
+
+      if (!value || busy) {
+        return;
+      }
+
+      busy = true;
+      sendButton.disabled = true;
+      input.disabled = true;
+      welcome.hidden = true;
+
+      addMessage(value, "user");
+      input.value = "";
+
+      const pending = addMessage("Thinking", "assistant", {
+        thinking: true
+      });
+
+      setStatus("working", "Cove is thinking");
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: value
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "The server returned an error (" +
+            response.status + ")."
+          );
+        }
+
+        if (typeof data.reply !== "string" || !data.reply.trim()) {
+          throw new Error("Cove received an empty response.");
+        }
+
+        pending.content.classList.remove("thinking");
+        pending.content.textContent = data.reply;
+
+        setStatus("ready", "AI connected");
+      } catch (error) {
+        pending.content.classList.remove("thinking");
+        pending.content.textContent =
+          "I couldn't get a response. " +
+          error.message +
+          "\n\nCheck that the Cove server and Ollama are running, " +
+          "then try again.";
+
+        setStatus("error", "Connection problem");
+        console.error("Cove chat error:", error);
+      } finally {
+        busy = false;
+        sendButton.disabled = false;
+        input.disabled = false;
+        input.focus();
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+    }
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      sendMessage();
+    });
+
+    document.querySelectorAll("[data-prompt]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        sendMessage(button.dataset.prompt);
+      });
+    });
+
+    newChatButton.addEventListener("click", function() {
+      if (busy) {
+        return;
+      }
+
+      messages.replaceChildren();
+      welcome.hidden = false;
+      input.value = "";
+      input.focus();
+      setStatus("ready", "Ready for a new chat");
+    });
+
+    // The green status means a successful chat request has completed.
+    setStatus("", "Waiting for first message");
+  </script>
 </body>
 </html>
