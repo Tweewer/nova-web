@@ -1,1204 +1,823 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="Cove AI is your coding companion for programming, debugging, and computer troubleshooting.">
+  <meta name="description" content="Cove AI helps you write code, debug errors, troubleshoot computers, and turn ideas into software.">
   <title>Cove AI — Your coding companion</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/styles/github-dark.min.css">
 
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #f8fafb;
-      --border: #e8ebef;
-      --text: #20252d;
-      --muted: #7a8490;
-      --accent: #00bfae;
-      --accent-dark: #009f92;
-      --accent-light: #e9faf7;
-      --shadow: 0 8px 30px rgba(20, 40, 55, 0.06);
+      color-scheme: light;
+      --bg: #fff;
+      --panel: #f7f9fa;
+      --panel-strong: #f0f5f5;
+      --border: #e4eaec;
+      --text: #202a30;
+      --muted: #718087;
+      --accent: #00a995;
+      --accent-dark: #008979;
+      --accent-soft: #e8f8f5;
+      --danger: #c74747;
+      --shadow: 0 10px 35px rgba(24, 47, 55, .07);
+      --sidebar-width: 250px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
     body {
-      margin: 0;
-      height: 100vh;
-      height: 100dvh;
       overflow: hidden;
       background: var(--bg);
       color: var(--text);
-      font-family: Inter, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
-
-    button, input {
-      font: inherit;
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(0, 169, 149, .25);
+      outline-offset: 2px;
     }
-
-    button {
-      cursor: pointer;
-    }
-
-    button:focus-visible, input:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
-    }
-
-    .app {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      animation: app-enter 0.45s ease-out both;
-    }
-
-    /* Sidebar */
-
+    button:disabled { cursor: not-allowed; opacity: .6; }
+    .app { display: flex; height: 100dvh; min-height: 0; }
     .sidebar {
-      width: 250px;
-      flex-shrink: 0;
+      width: var(--sidebar-width);
+      flex: 0 0 var(--sidebar-width);
       display: flex;
       flex-direction: column;
-      padding: 24px 17px;
-      background: var(--surface);
+      gap: 22px;
+      padding: 22px 15px 16px;
+      background: var(--panel);
       border-right: 1px solid var(--border);
     }
-
-    .brand {
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 8px; }
+    .brand-logo, .topbar-logo, .welcome-logo, .message-logo, .avatar {
+      object-fit: contain;
+      object-position: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+      padding: 3px;
+      background: #fff;
+    }
+    .brand-logo { width: 42px; height: 42px; }
+    .brand-name { font-size: 23px; font-weight: 780; letter-spacing: -.8px; }
+    .brand-name span { color: var(--accent); }
+    .new-chat {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      width: 100%;
+      min-height: 43px;
+      padding: 10px 12px;
+      border: 1px solid #cfe9e4;
+      border-radius: 12px;
+      background: #fff;
+      color: #176c63;
+      font-weight: 650;
+      transition: background .18s, border-color .18s, transform .18s;
+    }
+    .new-chat:hover { background: var(--accent-soft); border-color: #a6dcd3; }
+    .new-chat .plus { font-size: 20px; line-height: 1; font-weight: 400; }
+    .section-label {
+      padding: 0 10px;
+      color: #9aa5aa;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .13em;
+    }
+    .mode-list { display: grid; gap: 5px; margin-top: -14px; }
+    .mode-button {
       display: flex;
       align-items: center;
       gap: 11px;
-      padding: 0 8px;
-      margin-bottom: 34px;
-    }
-
-    .brand-logo {
-      width: 43px;
-      height: 43px;
-      object-fit: cover;
-      border-radius: 50%;
-      flex-shrink: 0;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .brand-logo:hover {
-      transform: scale(1.06);
-      box-shadow: 0 0 16px rgba(0, 191, 174, 0.22);
-    }
-
-    .brand-name {
-      font-size: 25px;
-      font-weight: 750;
-      letter-spacing: -1px;
-    }
-
-    .brand-ai {
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0;
-    }
-
-    .new-chat {
       width: 100%;
+      padding: 11px 12px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: #58666c;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 560;
+    }
+    .mode-button:hover { background: #edf3f3; }
+    .mode-button.active {
+      background: var(--accent-soft);
+      border-color: #d5efea;
+      color: #087f72;
+      font-weight: 700;
+    }
+    .mode-icon {
+      display: grid;
+      place-items: center;
+      width: 25px;
+      height: 25px;
+      border-radius: 7px;
+      background: #fff;
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .sidebar-note {
+      margin-top: auto;
       padding: 13px;
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: white;
-      color: var(--text);
-      text-align: left;
-      transition: background 0.2s, border-color 0.2s,
-        transform 0.2s;
+      background: rgba(255,255,255,.7);
     }
-
-    .new-chat:hover {
-      background: var(--accent-light);
-      border-color: #b8e9e3;
-      transform: translateY(-1px);
-    }
-
-    .section-label {
-      margin: 32px 10px 12px;
-      color: #969faa;
-      font-size: 10px;
-      font-weight: 750;
-      letter-spacing: 1.5px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 12px;
-      border-radius: 10px;
-      color: #626d78;
-      font-size: 13px;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    .nav-item.active {
-      background: var(--accent-light);
-      color: var(--accent-dark);
-      font-weight: 650;
-    }
-
-    .nav-icon {
-      width: 18px;
-      text-align: center;
-      font-size: 16px;
-    }
-
-    .sidebar-bottom {
-      margin-top: auto;
-      padding: 17px 8px 0;
-      border-top: 1px solid var(--border);
-    }
-
+    .sidebar-note strong { display: block; margin-bottom: 5px; font-size: 12px; }
+    .sidebar-note p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
     .profile {
       display: flex;
       align-items: center;
       gap: 10px;
+      padding: 14px 8px 0;
+      border-top: 1px solid var(--border);
     }
+    .avatar { width: 33px; height: 33px; background: #e4f6f2; }
+    .profile-name { font-size: 12px; font-weight: 700; }
+    .profile-subtitle { margin-top: 3px; color: var(--muted); font-size: 11px; }
 
-    .avatar {
-      width: 37px;
-      height: 37px;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-
-    .profile-name {
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    .profile-subtitle {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    /* Main layout */
-
-    .main {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-    }
-
+    .main { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; }
     .topbar {
-      min-height: 68px;
-      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 15px;
-      padding: 10px 27px;
+      gap: 16px;
+      min-height: 68px;
+      padding: 0 27px;
       border-bottom: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255,255,255,.94);
     }
-
-    .topbar-title {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      min-width: 0;
-    }
-
-    .topbar-logo {
-      width: 39px;
-      height: 39px;
-      object-fit: cover;
-      border-radius: 50%;
-      flex-shrink: 0;
-      animation: logo-enter 0.7s ease-out both;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .topbar-logo:hover {
-      transform: scale(1.07);
-      box-shadow: 0 0 15px rgba(0, 191, 174, 0.25);
-    }
-
-    .brand-text {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 14px;
-      font-weight: 650;
-    }
-
-    .title-divider {
-      color: var(--accent);
-    }
-
-    .brand-subtitle {
-      color: var(--muted);
-      font-weight: 450;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      flex-shrink: 0;
-      border-radius: 50%;
-      background: #d99b34;
-    }
-
-    .status-dot.ready {
-      background: #24a66b;
-      animation: status-pulse 2.2s ease-in-out infinite;
-    }
-
-    .status-dot.error {
-      background: #d9534f;
-    }
-
-    /* Chat */
-
-    .chat-area {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      padding: 30px 23px;
-      scroll-behavior: smooth;
-    }
-
-    .welcome {
-      width: min(690px, 100%);
-      margin: 5vh auto 0;
-      text-align: center;
-      animation: welcome-enter 0.65s ease-out both;
-    }
-
-    .welcome[hidden] {
-      display: none;
-    }
-
-    .welcome-icon {
-      width: 76px;
-      height: 76px;
+    .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .mobile-menu { display: none; }
+    .topbar-logo { width: 34px; height: 34px; }
+    .topbar-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 730; }
+    .slash { color: #c2cccf; }
+    .topbar-subtitle { color: var(--muted); font-weight: 500; }
+    .status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #c5a15a; }
+    .status-dot.ready { background: #20a66f; }
+    .status-dot.error { background: var(--danger); }
+    .chat-area { flex: 1; min-height: 0; overflow-y: auto; padding: 32px 24px 22px; scroll-behavior: smooth; }
+    .welcome { width: min(760px, 100%); margin: clamp(12px, 5vh, 55px) auto 36px; text-align: center; }
+    .welcome[hidden] { display: none; }
+    .welcome-mark {
       display: grid;
       place-items: center;
-      margin: 0 auto 24px;
-      border: 1px solid #d9efeb;
-      border-radius: 23px;
-      background: linear-gradient(145deg, #f0fbf9, #ffffff);
-      box-shadow: 0 8px 32px rgba(0, 191, 174, 0.08);
-      overflow: hidden;
-      animation: logo-float 4s ease-in-out infinite;
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 22px;
+      border: 1px solid #d7eee9;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #eaf9f6, #fff);
+      box-shadow: 0 8px 30px rgba(0,169,149,.08);
     }
-
-    .welcome-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(29px, 4vw, 43px);
-      line-height: 1.2;
-      letter-spacing: -1.7px;
-      font-weight: 760;
-    }
-
-    .welcome-description {
-      margin: 15px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.9;
-    }
-
-    .suggestions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 34px;
-      text-align: left;
-    }
-
+    .welcome-logo { width: 49px; height: 49px; }
+    .welcome h1 { margin: 0; font-size: clamp(27px, 3.5vw, 37px); line-height: 1.2; letter-spacing: -1.3px; font-weight: 760; }
+    .welcome h1 span { color: var(--accent-dark); }
+    .welcome-description { max-width: 500px; margin: 13px auto 27px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    .suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; text-align: left; }
     .suggestion {
-      min-height: 105px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      min-height: 112px;
       padding: 16px;
       border: 1px solid var(--border);
       border-radius: 14px;
-      background: white;
-      text-align: left;
-      transition: border-color 0.2s, background 0.2s,
-        transform 0.2s, box-shadow 0.2s;
-    }
-
-    .suggestion:hover {
-      border-color: #b3e7e0;
-      background: #fbfffe;
-      transform: translateY(-3px);
-      box-shadow: var(--shadow);
-    }
-
-    .suggestion:active {
-      transform: translateY(-1px) scale(0.99);
-    }
-
-    .suggestion-icon {
-      display: block;
-      margin-bottom: 10px;
-      color: var(--accent-dark);
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .suggestion strong {
-      display: block;
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    .suggestion-description {
-      display: block;
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    /* Messages */
-
-    .messages {
-      width: min(760px, 100%);
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
-
-    .message {
-      max-width: 92%;
-      min-width: 0;
-      overflow-wrap: anywhere;
-      font-size: 14px;
-      line-height: 1.8;
-      animation: message-enter 0.25s ease-out both;
-    }
-
-    .message.user {
-      align-self: flex-end;
-      padding: 12px 16px;
-      border-radius: 17px 17px 4px 17px;
-      background: var(--accent-light);
-      white-space: pre-wrap;
-    }
-
-    .message.assistant {
-      align-self: flex-start;
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .message-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-      color: var(--accent-dark);
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    .message-logo {
-      width: 22px;
-      height: 22px;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-
-    .message-content {
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .message-content pre {
-      max-width: 100%;
-      overflow-x: auto;
-      padding: 15px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      background: #f7f9fa;
-      color: #252938;
-      font-size: 13px;
-      line-height: 1.65;
-    }
-
-    .message-content code {
-      font-family: Consolas, "Courier New", monospace;
-    }
-
-    .thinking {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: var(--muted);
-    }
-
-    .thinking-dots {
-      display: inline-flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .thinking-dots span {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: dot-bounce 1s ease-in-out infinite;
-    }
-
-    .thinking-dots span:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    .thinking-dots span:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    /* Message input */
-
-    .composer-wrap {
-      flex-shrink: 0;
-      padding: 12px 22px 18px;
-      background: white;
-    }
-
-    .composer {
-      width: min(760px, 100%);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 0 auto;
-      padding: 8px;
-      border: 1px solid #dfe5e8;
-      border-radius: 17px;
-      background: white;
-      box-shadow: 0 5px 24px rgba(23, 35, 50, 0.04);
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .composer:focus-within {
-      border-color: #8bded4;
-      box-shadow: 0 0 0 3px rgba(0, 191, 174, 0.09);
-    }
-
-    .composer input {
-      flex: 1;
-      width: 0;
-      min-width: 0;
-      padding: 12px;
-      border: 0;
-      outline: none;
-      background: transparent;
+      background: #fff;
       color: var(--text);
-      font-size: 14px;
+      text-align: left;
+      transition: border-color .18s, box-shadow .18s, transform .18s;
     }
+    .suggestion:hover { border-color: #b7e2da; box-shadow: 0 7px 22px rgba(20,70,70,.06); transform: translateY(-1px); }
+    .suggestion-icon { color: var(--accent-dark); font-size: 17px; font-weight: 750; }
+    .suggestion strong { font-size: 13px; font-weight: 720; }
+    .suggestion-description { color: var(--muted); font-size: 11px; line-height: 1.45; }
 
-    .composer input::placeholder {
-      color: #999faa;
+    .messages { width: min(790px, 100%); margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+    .message { max-width: 100%; min-width: 0; animation: appear .2s ease-out; }
+    .message.user { align-self: flex-end; max-width: min(82%, 650px); padding: 12px 16px; border: 1px solid #d7eee9; border-radius: 17px 17px 5px 17px; background: var(--accent-soft); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; font-size: 14px; }
+    .message.assistant { align-self: stretch; }
+    .message-label { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; color: var(--accent-dark); font-size: 12px; font-weight: 750; }
+    .message-logo { width: 22px; height: 22px; }
+    .message-content { min-width: 0; color: #2b353a; font-size: 14px; line-height: 1.75; overflow-wrap: anywhere; }
+    .message-content p { margin: 0 0 13px; }
+    .message-content p:last-child { margin-bottom: 0; }
+    .message-content h1, .message-content h2, .message-content h3, .message-content h4 { margin: 23px 0 9px; color: #183b3c; line-height: 1.35; letter-spacing: -.25px; }
+    .message-content h1 { font-size: 23px; }
+    .message-content h2 { font-size: 19px; }
+    .message-content h3 { font-size: 16px; }
+    .message-content ul, .message-content ol { margin: 9px 0 17px; padding-left: 25px; }
+    .message-content li { margin: 4px 0; padding-left: 2px; }
+    .message-content a { color: #007f73; text-underline-offset: 3px; }
+    .message-content blockquote { margin: 15px 0; padding: 9px 15px; border-left: 3px solid #70c8bc; border-radius: 0 8px 8px 0; background: #f2f8f7; color: #53676a; }
+    .message-content :not(pre) > code { padding: 2px 5px; border: 1px solid #e3eceb; border-radius: 5px; background: #f1f6f5; color: #08796e; font-family: Consolas, "Courier New", monospace; font-size: .9em; }
+    .code-block { margin: 15px 0 18px; overflow: hidden; border: 1px solid #2b3b47; border-radius: 11px; background: #0f1821; }
+    .code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; border-bottom: 1px solid #2b3b47; background: #17232d; color: #b5c8d0; font-size: 10px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .copy-code { padding: 5px 9px; border: 1px solid #526572; border-radius: 6px; background: transparent; color: #e6eef1; font-size: 11px; letter-spacing: 0; text-transform: none; }
+    .copy-code:hover { background: #2a3d49; }
+    .code-block pre { max-width: 100%; margin: 0; padding: 15px; overflow: auto; color: #e7edf2; font-size: 12px; line-height: 1.65; tab-size: 2; }
+    .code-block pre code { background: transparent; font-family: Consolas, "Courier New", monospace; }
+    .message-content table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
+    .message-content th, .message-content td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
+    .message-content th { background: #f1f6f5; }
+    .message-content hr { height: 1px; border: 0; background: var(--border); margin: 20px 0; }
+    .thinking { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); }
+    .thinking-dots { display: inline-flex; gap: 4px; }
+    .thinking-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: bounce 1s ease-in-out infinite; }
+    .thinking-dots span:nth-child(2) { animation-delay: .15s; }
+    .thinking-dots span:nth-child(3) { animation-delay: .3s; }
+    .error-message { color: #a63838; }
+    .composer-wrap { flex-shrink: 0; padding: 10px 22px 17px; background: linear-gradient(to bottom, rgba(255,255,255,.88), #fff 25%); }
+    .composer { display: flex; align-items: flex-end; gap: 9px; width: min(790px, 100%); margin: 0 auto; padding: 8px; border: 1px solid #dce5e7; border-radius: 16px; background: #fff; box-shadow: 0 5px 24px rgba(23,35,50,.045); transition: border-color .2s, box-shadow .2s; }
+    .composer:focus-within { border-color: #9edbd2; box-shadow: 0 0 0 3px rgba(0,169,149,.07), 0 5px 24px rgba(23,35,50,.04); }
+    .attach-button { display:grid; place-items:center; width:38px; height:40px; flex:0 0 38px; border:0; border-radius:10px; background:#f1f7f6; color:#397d75; font-size:20px; cursor:pointer; }
+    .attach-button:hover { background:#e5f2ef; }
+    .attach-button:disabled { opacity:.5; cursor:not-allowed; }
+    .image-preview-row { display:none; width:min(790px,100%); margin:0 auto 8px; gap:8px; flex-wrap:wrap; }
+    .image-preview-row.has-images { display:flex; }
+    .image-preview { position:relative; width:64px; height:64px; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#f5f8f8; }
+    .image-preview img { width:100%; height:100%; object-fit:cover; }
+    .image-preview button { position:absolute; top:2px; right:2px; width:20px; height:20px; border:0; border-radius:50%; background:#17232ddd; color:#fff; cursor:pointer; line-height:1; }
+    .message-images { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .message-images img { max-width:min(220px,100%); max-height:180px; border-radius:10px; border:1px solid var(--border); object-fit:contain; }
+    .composer textarea { display: block; flex: 1; min-width: 0; max-height: 180px; min-height: 42px; resize: none; padding: 11px 10px; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 14px; line-height: 1.45; }
+    .composer textarea::placeholder { color: #98a4a9; }
+    .composer textarea:focus-visible { outline: none; }
+    .send-button { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border: 0; border-radius: 11px; background: var(--accent); color: #fff; font-size: 23px; transition: background .18s, transform .18s; }
+    .send-button:hover { background: var(--accent-dark); }
+    .send-button:active { transform: scale(.96); }
+    .send-button:disabled { background: #a5d9d1; }
+    .composer-help { display: flex; justify-content: space-between; gap: 12px; width: min(790px, 100%); margin: 8px auto 0; color: #97a2a6; font-size: 10px; line-height: 1.5; }
+    .toast { position: fixed; z-index: 10; left: 50%; bottom: 92px; transform: translate(-50%, 10px); padding: 9px 13px; border: 1px solid var(--border); border-radius: 9px; background: #fff; box-shadow: var(--shadow); color: var(--text); font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.show { transform: translate(-50%, 0); opacity: 1; }
+    @keyframes appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .55; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+    @media (max-width: 760px) {
+      .sidebar { position: fixed; z-index: 5; inset: 0 auto 0 0; width: min(280px, 86vw); transform: translateX(-105%); transition: transform .22s ease; box-shadow: var(--shadow); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop { display: none; position: fixed; z-index: 4; inset: 0; background: rgba(18,35,39,.25); }
+      .sidebar-backdrop.show { display: block; }
+      .mobile-menu { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--text); }
+      .topbar { min-height: 60px; padding: 0 14px; }
+      .topbar-logo { width: 30px; height: 30px; }
+      .topbar-subtitle, .slash { display: none; }
+      .status { font-size: 10px; gap: 6px; }
+      .live-indicator { margin-right: 8px; padding: 4px 6px; font-size: 8px; }
+      .chat-area { padding: 22px 15px; }
+      .welcome { margin-top: 4vh; }
+      .welcome h1 { font-size: 28px; }
+      .welcome-description { font-size: 13px; }
+      .suggestions { gap: 8px; }
+      .suggestion { min-height: 108px; padding: 12px; }
+      .suggestion-description { font-size: 10px; }
+      .message.user { max-width: 92%; }
+      .composer-wrap { padding: 8px 12px 12px; }
+      .composer-help { font-size: 9px; }
     }
-
-    .send {
-      width: 43px;
-      height: 43px;
-      flex-shrink: 0;
-      border: 0;
-      border-radius: 13px;
-      background: var(--accent);
-      color: white;
-      font-size: 23px;
-      transition: background 0.2s, transform 0.2s,
-        opacity 0.2s;
+    @media (max-width: 420px) {
+      .status-text { display: none; }
+      .suggestions { grid-template-columns: 1fr; }
+      .suggestion { min-height: auto; display: grid; grid-template-columns: 24px 1fr; column-gap: 8px; align-items: center; }
+      .suggestion-icon { grid-row: span 2; }
+      .suggestion-description { grid-column: 2; }
+      .welcome { margin-top: 15px; }
+      .welcome-mark { width: 60px; height: 60px; margin-bottom: 16px; }
+      .welcome-logo { width: 42px; height: 42px; }
     }
-
-    .send:hover:not(:disabled) {
-      background: var(--accent-dark);
-      transform: translateY(-2px);
-    }
-
-    .send:active:not(:disabled) {
-      transform: scale(0.94);
-    }
-
-    .send:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .disclaimer {
-      width: min(760px, 100%);
-      margin: 11px auto 0;
-      color: #969faa;
-      text-align: center;
-      font-size: 10px;
-      line-height: 1.6;
-    }
-
-    /* Animations */
-
-    @keyframes app-enter {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes logo-enter {
-      from {
-        opacity: 0;
-        transform: translateY(-6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes welcome-enter {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes message-enter {
-      from {
-        opacity: 0;
-        transform: translateY(7px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes logo-float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-    }
-
-    @keyframes status-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(36, 166, 107, 0.2); }
-      50% { box-shadow: 0 0 0 5px rgba(36, 166, 107, 0); }
-    }
-
-    @keyframes dot-bounce {
-      0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
-      30% { transform: translateY(-4px); opacity: 1; }
-    }
-
-    /* Responsive layout */
-
-    @media (max-width: 700px) {
-      .sidebar {
-        display: none;
-      }
-
-      .topbar {
-        min-height: 60px;
-        padding: 9px 15px;
-      }
-
-      .topbar-logo {
-        width: 34px;
-        height: 34px;
-      }
-
-      .brand-text {
-        gap: 5px;
-        font-size: 13px;
-      }
-
-      .brand-subtitle {
-        font-size: 12px;
-      }
-
-      .status {
-        gap: 6px;
-        font-size: 10px;
-      }
-
-      .chat-area {
-        padding: 24px 16px;
-      }
-
-      .welcome {
-        margin-top: 4vh;
-      }
-
-      .welcome-icon {
-        width: 64px;
-        height: 64px;
-        margin-bottom: 20px;
-      }
-
-      .welcome-description {
-        font-size: 13px;
-      }
-
-      .suggestions {
-        gap: 9px;
-        margin-top: 25px;
-      }
-
-      .suggestion {
-        min-height: 110px;
-        padding: 12px;
-      }
-
-      .composer-wrap {
-        padding: 10px 12px 14px;
-      }
-
-      .message {
-        max-width: 97%;
-      }
-    }
-
-    @media (max-width: 390px) {
-      .brand-subtitle {
-        display: none;
-      }
-
-      .suggestions {
-        grid-template-columns: 1fr;
-      }
-
-      .suggestion {
-        min-height: auto;
-      }
-
-      .welcome {
-        margin-top: 12px;
-      }
-
-      .status {
-        font-size: 9px;
-      }
-    }
-
-    @media (max-height: 650px) {
-      .welcome {
-        margin-top: 0;
-      }
-
-      .welcome-icon {
-        width: 54px;
-        height: 54px;
-        margin-bottom: 14px;
-      }
-
-      .suggestions {
-        margin-top: 20px;
-      }
-
-      .chat-area {
-        padding-top: 18px;
-      }
-    }
-
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-        scroll-behavior: auto !important;
-        
-/* Readable AI responses */
-.message-content {
-  font-size: 15px;
-  line-height: 1.75;
-  overflow-wrap: anywhere;
-}
-
-.message-content p {
-  margin: 0 0 14px;
-}
-
-.message-content p:last-child {
-  margin-bottom: 0;
-}
-
-.message-content h1,
-.message-content h2,
-.message-content h3 {
-  line-height: 1.35;
-  margin: 24px 0 10px;
-  color: #173b42;
-}
-
-.message-content ul,
-.message-content ol {
-  padding-left: 25px;
-  margin: 10px 0 18px;
-}
-
-.message-content li {
-  margin: 5px 0;
-}
-
-.message-content :not(pre) > code {
-  background: #edf3f4;
-  color: #176b70;
-  padding: 3px 6px;
-  border-radius: 5px;
-  font-family: Consolas, monospace;
-  font-size: 0.9em;
-}
-
-.code-block {
-  margin: 18px 0;
-  border: 1px solid #293d49;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #111c27;
-  color: #e5edf5;
-}
-
-.code-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  background: #1c2a38;
-  border-bottom: 1px solid #344453;
-  color: #a9c2d0;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.copy-code {
-  border: 1px solid #536775;
-  border-radius: 6px;
-  background: transparent;
-  color: #e5edf5;
-  padding: 6px 10px;
-  cursor: pointer;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.copy-code:hover {
-  background: #304453;
-}
-
-.code-block pre {
-  margin: 0;
-  padding: 18px;
-  overflow-x: auto;
-  white-space: pre;
-  line-height: 1.6;
-  font-size: 13px;
-}
-
-.code-block pre code {
-  background: transparent;
-  color: inherit;
-  padding: 0;
-  font-family: Consolas, "Courier New", monospace;
-}
-
-.message-content blockquote {
-  margin: 16px 0;
-  padding: 10px 16px;
-  border-left: 3px solid #42a9a5;
-  background: #f2f8f8;
-  color: #455c62;
-  border-radius: 0 8px 8px 0;
-}
-
-.message-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 16px 0;
-  display: block;
-  overflow-x: auto;
-}
-
-.message-content th,
-.message-content td {
-  border: 1px solid #dce5e8;
-  padding: 9px 12px;
-  text-align: left;
-}
-
-.message-content th {
-  background: #edf3f4;
-}
-
-      }
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     }
   </style>
 </head>
-
 <body>
   <div class="app">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
       <div class="brand">
-        <img class="brand-logo" src="/cove-logo.jpg" alt="Cove logo">
-        <div class="brand-name">
-          Cove<span class="brand-ai"> AI</span>
-        </div>
+        <img class="brand-logo" src="/cove%20logo.jpg" alt="Cove logo" onerror="this.style.display='none'">
+        <div class="brand-name">Cove<span> AI</span></div>
       </div>
 
       <button class="new-chat" id="newChat" type="button">
-        + &nbsp; New conversation
+        <span class="plus" aria-hidden="true">+</span> New conversation
       </button>
 
       <div class="section-label">WORKSPACE</div>
+      <nav class="mode-list" aria-label="Assistant mode">
+        <button class="mode-button active" type="button" data-mode="coding" aria-pressed="true">
+          <span class="mode-icon" aria-hidden="true">&lt;/&gt;</span> Coding assistant
+        </button>
+        <button class="mode-button" type="button" data-mode="computer" aria-pressed="false">
+          <span class="mode-icon" aria-hidden="true">⚙</span> Computer help
+        </button>
+        <button class="mode-button" type="button" data-mode="general" aria-pressed="false">
+          <span class="mode-icon" aria-hidden="true">✦</span> General assistant
+        </button>
+      </nav>
 
-      <div class="nav-item active">
-        <span class="nav-icon">&lt;/&gt;</span>
-        Coding assistant
+      <div class="sidebar-note">
+        <strong>Built for getting things done</strong>
+        <p>Ask questions, write code, troubleshoot devices, or check live web information.</p>
       </div>
 
-      <div class="nav-item">
-        <span class="nav-icon">⚙</span>
-        Computer help
-      </div>
-
-      <div class="sidebar-bottom">
-        <div class="profile">
-          <img class="avatar" src="/cove-logo.jpg" alt="">
-          <div>
-            <div class="profile-name">Cove AI</div>
-            <div class="profile-subtitle">Coding companion</div>
-          </div>
+      <div class="profile">
+        <img class="avatar" src="/cove%20logo.jpg" alt="" onerror="this.style.display='none'">
+        <div>
+          <div class="profile-name">Cove AI</div>
+          <div class="profile-subtitle">Your AI companion</div>
         </div>
       </div>
     </aside>
 
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
     <main class="main">
       <header class="topbar">
-        <div class="topbar-title">
-          <img class="topbar-logo" src="/cove-logo.jpg" alt="Cove AI logo">
-          <div class="brand-text">
-            <span>Cove</span>
-            <span class="title-divider">/</span>
-            <span class="brand-subtitle">Coding assistant</span>
+        <div class="topbar-left">
+          <button class="mobile-menu" id="mobileMenu" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+          <img class="topbar-logo" src="/cove%20logo.jpg" alt="" onerror="this.style.display='none'">
+          <div class="topbar-title">
+            <span>Cove</span><span class="slash">/</span><span class="topbar-subtitle" id="modeTitle">Coding assistant</span>
           </div>
         </div>
-
-        <div class="status" id="status">
+        <span class="live-indicator" title="Live web search, news and weather are available">LIVE WEB</span>
+        <div class="status" id="status" role="status" aria-live="polite">
           <span class="status-dot" id="statusDot"></span>
-          <span id="statusText">AI ready to connect</span>
+          <span class="status-text" id="statusText">Ready to connect</span>
         </div>
       </header>
 
-      <section class="chat-area" id="chatArea">
+      <section class="chat-area" id="chatArea" aria-label="Conversation">
         <div class="welcome" id="welcome">
-          <div class="welcome-icon">
-            <img src="/cove-logo.jpg" alt="Cove">
+          <div class="welcome-mark">
+            <img class="welcome-logo" src="/cove%20logo.jpg" alt="Cove" onerror="this.style.display='none'; this.parentElement.textContent='C'">
           </div>
+          <h1 id="welcomeTitle">What are we <span>building</span> today?</h1>
+          <p class="welcome-description" id="welcomeDescription">Your coding companion. Write code, solve errors, and turn ideas into software.</p>
 
-          <h1>What are we building today?</h1>
-
-          <p class="welcome-description">
-            Your coding companion.<br>
-            Write code, solve errors and turn ideas into software.
-          </p>
-
-          <div class="suggestions">
-            <button class="suggestion" type="button"
-              data-prompt="Help me write a Python program that asks for my name and greets me.">
+          <div class="suggestions" id="suggestions">
+            <button class="suggestion" type="button" data-prompt="Help me write a Python program that asks for my name and greets me.">
               <span class="suggestion-icon">&lt;/&gt;</span>
               <strong>Write some code</strong>
-              <span class="suggestion-description">
-                Create a Python project from scratch.
-              </span>
+              <span class="suggestion-description">Create a Python program from scratch.</span>
             </button>
-
-            <button class="suggestion" type="button"
-              data-prompt="Help me debug a programming error. Explain how to diagnose it step by step.">
+            <button class="suggestion" type="button" data-prompt="Help me debug a programming error. Explain how to diagnose it step by step.">
               <span class="suggestion-icon">⌕</span>
               <strong>Fix a coding error</strong>
-              <span class="suggestion-description">
-                Find bugs and understand error messages.
-              </span>
+              <span class="suggestion-description">Understand errors and find the cause.</span>
             </button>
-
-            <button class="suggestion" type="button"
-              data-prompt="Help me build a modern website using HTML, CSS and JavaScript.">
+            <button class="suggestion" type="button" data-prompt="Help me build a modern website using HTML, CSS and JavaScript. Start with a simple working version.">
               <span class="suggestion-icon">▤</span>
               <strong>Build a website</strong>
-              <span class="suggestion-description">
-                Turn an idea into a working web project.
-              </span>
+              <span class="suggestion-description">Turn an idea into a working web project.</span>
             </button>
-
-            <button class="suggestion" type="button"
-              data-prompt="Help me troubleshoot a Windows PC problem. Start by asking what is going wrong.">
+            <button class="suggestion" type="button" data-prompt="Help me troubleshoot a Windows PC problem. Ask me one question at a time and start with the safest checks.">
               <span class="suggestion-icon">⚙</span>
               <strong>Troubleshoot my PC</strong>
-              <span class="suggestion-description">
-                Investigate computer problems step by step.
-              </span>
+              <span class="suggestion-description">Work through computer problems safely.</span>
             </button>
           </div>
         </div>
-
         <div class="messages" id="messages" aria-live="polite"></div>
       </section>
 
       <footer class="composer-wrap">
+        <div class="image-preview-row" id="imagePreview" aria-label="Attached images"></div>
         <form class="composer" id="chatForm">
-          <input
-            id="message"
-            type="text"
-            placeholder="Ask Cove to help with your code..."
-            autocomplete="off"
-            aria-label="Message Cove"
-            maxlength="10000"
-            required
-          >
-
-          <button class="send" id="sendButton" type="submit"
-            aria-label="Send message">↑</button>
+          <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+          <button class="attach-button" id="attachButton" type="button" aria-label="Attach images" title="Attach images">＋</button>
+          <textarea id="message" rows="1" maxlength="10000" placeholder="Message Cove..." aria-label="Message Cove" required></textarea>
+          <button class="send-button" id="sendButton" type="submit" aria-label="Send message" title="Send message">↑</button>
         </form>
-
-        <div class="disclaimer">
-          Cove can make mistakes. Review generated code before running it.
-          Your messages are sent to the AI service configured on your server.
+        <div class="composer-help">
+          <span>Enter to send · Shift + Enter for a new line</span>
+          <span>Live information is sourced when needed. Check important answers and code.</span>
         </div>
       </footer>
     </main>
   </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Markdown is sanitized before it is inserted into the page. -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 
   <script>
-    const form = document.getElementById("chatForm");
-    const input = document.getElementById("message");
-    const sendButton = document.getElementById("sendButton");
-    const welcome = document.getElementById("welcome");
-    const messages = document.getElementById("messages");
-    const chatArea = document.getElementById("chatArea");
-    const newChatButton = document.getElementById("newChat");
-    const statusDot = document.getElementById("statusDot");
-    const statusText = document.getElementById("statusText");
+    (() => {
+      "use strict";
 
-    let busy = false;
+      const form = document.getElementById("chatForm");
+      const input = document.getElementById("message");
+      const sendButton = document.getElementById("sendButton");
+      const imageInput = document.getElementById("imageInput");
+      const attachButton = document.getElementById("attachButton");
+      const imagePreview = document.getElementById("imagePreview");
+      const welcome = document.getElementById("welcome");
+      const messages = document.getElementById("messages");
+      const chatArea = document.getElementById("chatArea");
+      const newChatButton = document.getElementById("newChat");
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("statusText");
+      const modeTitle = document.getElementById("modeTitle");
+      const welcomeTitle = document.getElementById("welcomeTitle");
+      const welcomeDescription = document.getElementById("welcomeDescription");
+      const suggestions = document.getElementById("suggestions");
+      const sidebar = document.getElementById("sidebar");
+      const mobileMenu = document.getElementById("mobileMenu");
+      const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+      const toast = document.getElementById("toast");
 
-    function setStatus(state, text) {
-      statusDot.className = "status-dot";
+      const modes = {
+        coding: {
+          title: "Coding assistant",
+          welcome: 'What are we <span>building</span> today?',
+          description: "Your coding companion. Write code, solve errors, and turn ideas into software.",
+          placeholder: "Ask Cove to help with your code...",
+          instruction: "The user is using Cove's Coding Assistant mode. Prioritize programming, debugging, code explanations, and practical software development. Give clear steps and fenced code blocks where useful."
+        },
+        computer: {
+          title: "Computer help",
+          welcome: 'Let’s fix it <span>together</span>.',
+          description: "Troubleshoot Windows, hardware, apps, and device issues one safe step at a time.",
+          placeholder: "Describe the computer problem...",
+          instruction: "The user is using Cove's Computer Help mode. Focus on PC, Windows, hardware, software, and device troubleshooting. Start with safe, reversible checks, ask focused questions when needed, and warn before destructive actions."
+        },
+        general: {
+          title: "General assistant",
+          welcome: 'What can I help <span>you with</span>?',
+          description: "Ask a question, explore an idea, or get help planning your next project.",
+          placeholder: "Ask Cove anything...",
+          instruction: "The user is using Cove's General Assistant mode. Help with general questions, learning, writing, planning, and everyday tasks. Be clear and honest about uncertainty."
+        }
+      };
 
-      if (state === "ready") {
-        statusDot.classList.add("ready");
-      } else if (state === "error") {
-        statusDot.classList.add("error");
+      let currentMode = "coding";
+      let busy = false;
+      let toastTimer = null;
+      let chatHistory = [];
+      let selectedImages = [];
+      const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+      const MAX_IMAGES = 3;
+
+      function setStatus(state, message) {
+        statusDot.className = "status-dot" + (state ? " " + state : "");
+        statusText.textContent = message;
       }
 
-      statusText.textContent = text;
-    }
-
-    function addMessage(text, type, options = {}) {
-      const message = document.createElement("div");
-      message.className = "message " + type;
-
-      if (type === "assistant") {
-        const label = document.createElement("div");
-        label.className = "message-label";
-
-        const logo = document.createElement("img");
-        logo.className = "message-logo";
-        logo.src = "/cove-logo.jpg";
-        logo.alt = "";
-
-        label.appendChild(logo);
-        label.appendChild(document.createTextNode("Cove"));
-        message.appendChild(label);
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
       }
 
-      const content = document.createElement("div");
-      content.className = "message-content";
+      function scrollToBottom() {
+        requestAnimationFrame(() => {
+          chatArea.scrollTop = chatArea.scrollHeight;
+        });
+      }
 
-      if (options.thinking) {
-        content.classList.add("thinking");
-        content.appendChild(document.createTextNode("Thinking"));
+      function closeSidebar() {
+        sidebar.classList.remove("open");
+        sidebarBackdrop.classList.remove("show");
+        mobileMenu.setAttribute("aria-expanded", "false");
+      }
 
-        const dots = document.createElement("span");
-        dots.className = "thinking-dots";
-        dots.setAttribute("aria-label", "Cove is generating a response");
+      function setMode(mode) {
+        if (!modes[mode]) return;
+        currentMode = mode;
+        const config = modes[mode];
+        modeTitle.textContent = config.title;
+        welcomeTitle.innerHTML = config.welcome;
+        welcomeDescription.textContent = config.description;
+        input.placeholder = config.placeholder;
 
-        for (let i = 0; i < 3; i++) {
-          dots.appendChild(document.createElement("span"));
+        document.querySelectorAll(".mode-button").forEach((button) => {
+          const active = button.dataset.mode === mode;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+        closeSidebar();
+      }
+
+      function addMessage(text, type, options = {}) {
+        const message = document.createElement("article");
+        message.className = "message " + type;
+
+        if (type === "assistant") {
+          const label = document.createElement("div");
+          label.className = "message-label";
+
+          const logo = document.createElement("img");
+          logo.className = "message-logo";
+          logo.src = "/cove%20logo.jpg";
+          logo.alt = "";
+          logo.onerror = () => { logo.style.display = "none"; };
+
+          const name = document.createElement("span");
+          name.textContent = "Cove";
+          label.append(logo, name);
+          message.appendChild(label);
         }
 
-        content.appendChild(dots);
-      } else {
-        // Keep AI output as text, not executable HTML.
-        content.textContent = text;
+        const content = document.createElement("div");
+        content.className = "message-content";
+
+        if (options.thinking) {
+          content.classList.add("thinking");
+          content.appendChild(document.createTextNode("Thinking"));
+
+          const dots = document.createElement("span");
+          dots.className = "thinking-dots";
+          dots.setAttribute("aria-label", "Cove is generating a response");
+          for (let i = 0; i < 3; i++) dots.appendChild(document.createElement("span"));
+          content.appendChild(dots);
+        } else if (options.error) {
+          content.classList.add("error-message");
+          content.textContent = text;
+        } else {
+          content.textContent = text;
+        }
+
+        if (options.images && options.images.length) {
+          const imageRow = document.createElement("div");
+          imageRow.className = "message-images";
+          options.images.forEach((item) => {
+            const image = document.createElement("img");
+            image.src = item.dataUrl;
+            image.alt = item.name || "User attached image";
+            imageRow.appendChild(image);
+          });
+          content.appendChild(imageRow);
+        }
+
+        message.appendChild(content);
+        messages.appendChild(message);
+        scrollToBottom();
+        return { message, content };
       }
 
-      message.appendChild(content);
-      messages.appendChild(message);
-      chatArea.scrollTop = chatArea.scrollHeight;
+      function renderAssistantReply(container, reply) {
+        // Safe fallback if a CDN library is blocked or unavailable.
+        if (!window.marked || !window.DOMPurify) {
+          container.textContent = reply;
+          return;
+        }
 
-      return { message, content };
-    }
-
-    async function sendMessage(text) {
-      const value = (
-        typeof text === "string" ? text : input.value
-      ).trim();
-
-      if (!value || busy) return;
-
-      busy = true;
-      sendButton.disabled = true;
-      input.disabled = true;
-      welcome.hidden = true;
-
-      addMessage(value, "user");
-      input.value = "";
-
-      const pending = addMessage("", "assistant", {
-        thinking: true
-      });
-
-      setStatus("working", "Cove is thinking");
-
-      try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: value
-          })
+        const rawHtml = window.marked.parse(reply, { gfm: true, breaks: false });
+        container.innerHTML = window.DOMPurify.sanitize(rawHtml, {
+          USE_PROFILES: { html: true }
         });
 
-        const data = await response.json().catch(() => ({}));
+        container.querySelectorAll("a").forEach((link) => {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        });
 
-        if (!response.ok) {
-          throw new Error(
-            data.error ||
-            "The server returned an error (" +
-            response.status + ")."
-          );
-        }
+        container.querySelectorAll("pre code").forEach((code) => {
+          const pre = code.parentElement;
+          if (!pre || pre.parentElement.classList.contains("code-block")) return;
 
-        if (
-          typeof data.reply !== "string" ||
-          !data.reply.trim()
-        ) {
-          throw new Error("Cove received an empty response.");
-        }
+          if (window.hljs) {
+            try { window.hljs.highlightElement(code); } catch (_) { /* keep plain code */ }
+          }
 
-        pending.content.classList.remove("thinking");
-        pending.content.replaceChildren();
-        pending.content.textContent = data.reply;
+          const wrapper = document.createElement("div");
+          wrapper.className = "code-block";
 
-        setStatus("ready", "AI connected");
-      } catch (error) {
-       
-pending.content.classList.remove("thinking");
-pending.content.replaceChildren();
+          const toolbar = document.createElement("div");
+          toolbar.className = "code-toolbar";
 
-const renderedHtml = marked.parse(data.reply, {
-  gfm: true,
-  breaks: true
-});
+          const languageMatch = code.className.match(/language-([\w-]+)/);
+          const language = document.createElement("span");
+          language.textContent = languageMatch ? languageMatch[1] : "Code";
 
-pending.content.innerHTML = DOMPurify.sanitize(renderedHtml);
+          const copyButton = document.createElement("button");
+          copyButton.type = "button";
+          copyButton.className = "copy-code";
+          copyButton.textContent = "Copy code";
+          copyButton.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(code.textContent || "");
+              copyButton.textContent = "Copied!";
+              setTimeout(() => { copyButton.textContent = "Copy code"; }, 1600);
+            } catch (_) {
+              // Clipboard access may be unavailable outside a secure context.
+              const range = document.createRange();
+              range.selectNodeContents(code);
+              const selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+              copyButton.textContent = "Select and copy";
+            }
+          });
 
-pending.content.querySelectorAll("pre code").forEach((codeBlock) => {
-  const pre = codeBlock.parentElement;
+          toolbar.append(language, copyButton);
+          pre.parentNode.insertBefore(wrapper, pre);
+          wrapper.append(toolbar, pre);
+        });
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "code-block";
-
-  const toolbar = document.createElement("div");
-  toolbar.className = "code-toolbar";
-
-  const languageMatch = codeBlock.className.match(/language-([\w-]+)/);
-  const language = document.createElement("span");
-  language.textContent = languageMatch ? languageMatch[1] : "CODE";
-
-  const copyButton = document.createElement("button");
-  copyButton.type = "button";
-  copyButton.className = "copy-code";
-  copyButton.textContent = "Copy code";
-
-  copyButton.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(codeBlock.textContent);
-      copyButton.textContent = "Copied!";
-      setTimeout(() => {
-        copyButton.textContent = "Copy code";
-      }, 1500);
-    } catch {
-      copyButton.textContent = "Copy failed";
-    }
-  });
-
-  toolbar.append(language, copyButton);
-  pre.parentNode.insertBefore(wrapper, pre);
-  wrapper.append(toolbar, pre);
-});
-
-setStatus("ready", "AI connected");
-
-        console.error("Cove chat error:", error);
-      } finally {
-        busy = false;
-        sendButton.disabled = false;
-        input.disabled = false;
-        input.focus();
-        chatArea.scrollTop = chatArea.scrollHeight;
+        scrollToBottom();
       }
-    }
 
-    form.addEventListener("submit", function(event) {
-      event.preventDefault();
-      sendMessage();
-    });
+      function updateImagePreview() {
+        imagePreview.replaceChildren();
+        imagePreview.classList.toggle("has-images", selectedImages.length > 0);
+        selectedImages.forEach((item, index) => {
+          const tile = document.createElement("div");
+          tile.className = "image-preview";
+          const image = document.createElement("img");
+          image.src = item.dataUrl;
+          image.alt = item.name;
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.textContent = "×";
+          remove.setAttribute("aria-label", "Remove " + item.name);
+          remove.addEventListener("click", () => {
+            selectedImages.splice(index, 1);
+            updateImagePreview();
+          });
+          tile.append(image, remove);
+          imagePreview.appendChild(tile);
+        });
+      }
 
-    document.querySelectorAll("[data-prompt]").forEach(function(button) {
-      button.addEventListener("click", function() {
-        sendMessage(button.dataset.prompt);
+      function readImage(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve({ name: file.name, dataUrl: String(reader.result) });
+          reader.onerror = () => reject(new Error("Cove couldn't read " + file.name + "."));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function sendMessage(explicitText) {
+        const value = (typeof explicitText === "string" ? explicitText : input.value).trim();
+        if ((!value && !selectedImages.length) || busy) return;
+
+        busy = true;
+        sendButton.disabled = true;
+        attachButton.disabled = true;
+        input.disabled = true;
+        welcome.hidden = true;
+
+        const imagesForMessage = selectedImages.slice();
+        const shownText = value || "Please analyse the attached image(s).";
+        addMessage(shownText, "user", { images: imagesForMessage });
+        input.value = "";
+        selectedImages = [];
+        updateImagePreview();
+        resizeInput();
+
+        const pending = addMessage("", "assistant", { thinking: true });
+        setStatus("", "Cove is thinking");
+
+        const requestMessage = modes[currentMode].instruction + "\n\nUser message:\n" + shownText;
+        const userContent = imagesForMessage.length
+          ? [{ type: "text", text: requestMessage }, ...imagesForMessage.map((item) => ({ type: "image_url", image_url: { url: item.dataUrl } }))]
+          : requestMessage;
+        chatHistory.push({ role: "user", content: userContent });
+        // Keep a rolling active-chat window so requests remain within practical context limits.
+        if (chatHistory.length > 24) chatHistory = chatHistory.slice(-24);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90000);
+
+        try {
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messages: chatHistory }),
+            signal: controller.signal
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(data.error || "The server returned an error (" + response.status + ").");
+          }
+          if (typeof data.reply !== "string" || !data.reply.trim()) {
+            throw new Error("Cove received an empty response. Please try again.");
+          }
+
+          chatHistory.push({ role: "assistant", content: data.reply });
+          if (chatHistory.length > 24) chatHistory = chatHistory.slice(-24);
+          pending.content.classList.remove("thinking");
+          pending.content.replaceChildren();
+          renderAssistantReply(pending.content, data.reply);
+          setStatus("ready", "AI connected · Chat memory active");
+        } catch (error) {
+          // Do not leave an unanswered user turn in the model's conversation history.
+          const lastUserIndex = chatHistory.map((item) => item.role).lastIndexOf("user");
+          if (lastUserIndex >= 0) chatHistory.splice(lastUserIndex, 1);
+          pending.content.classList.remove("thinking");
+          pending.content.replaceChildren();
+          const message = error.name === "AbortError"
+            ? "Cove took too long to respond. Please try again."
+            : (error.message || "Something went wrong while contacting Cove.");
+          pending.content.classList.add("error-message");
+          pending.content.textContent = message;
+          setStatus("error", "Connection issue");
+        } finally {
+          clearTimeout(timeoutId);
+          busy = false;
+          sendButton.disabled = false;
+          attachButton.disabled = false;
+          input.disabled = false;
+          input.focus();
+          scrollToBottom();
+        }
+      }
+
+      function resizeInput() {
+        input.style.height = "auto";
+        input.style.height = Math.min(input.scrollHeight, 180) + "px";
+      }
+
+      function resetChat() {
+        if (busy) {
+          showToast("Wait for Cove to finish replying first.");
+          return;
+        }
+        messages.replaceChildren();
+        chatHistory = [];
+        selectedImages = [];
+        updateImagePreview();
+        imageInput.value = "";
+        welcome.hidden = false;
+        input.value = "";
+        resizeInput();
+        setStatus("", "Ready to connect");
+        input.focus();
+        scrollToBottom();
+      }
+
+      attachButton.addEventListener("click", () => imageInput.click());
+      imageInput.addEventListener("change", async () => {
+        const files = Array.from(imageInput.files || []);
+        imageInput.value = "";
+        if (selectedImages.length + files.length > MAX_IMAGES) {
+          showToast("You can attach up to 3 images per message.");
+          return;
+        }
+        for (const file of files) {
+          if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+            showToast("Please use JPG, PNG or WebP images.");
+            continue;
+          }
+          if (file.size > MAX_IMAGE_BYTES) {
+            showToast(file.name + " is over the 4 MB limit.");
+            continue;
+          }
+          try { selectedImages.push(await readImage(file)); }
+          catch (error) { showToast(error.message); }
+        }
+        updateImagePreview();
       });
-    });
 
-    newChatButton.addEventListener("click", function() {
-      if (busy) return;
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        sendMessage();
+      });
 
-      messages.replaceChildren();
-      welcome.hidden = false;
-      input.value = "";
-      input.focus();
-      setStatus("", "Ready for a new chat");
-    });
+      input.addEventListener("input", resizeInput);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+          event.preventDefault();
+          form.requestSubmit();
+        }
+      });
 
-    // The status turns green after a successful chat request.
-    setStatus("", "Waiting for first message");
+      newChatButton.addEventListener("click", resetChat);
+
+      document.querySelectorAll(".mode-button").forEach((button) => {
+        button.addEventListener("click", () => setMode(button.dataset.mode));
+      });
+
+      suggestions.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-prompt]");
+        if (button) sendMessage(button.dataset.prompt);
+      });
+
+      mobileMenu.addEventListener("click", () => {
+        const isOpen = sidebar.classList.toggle("open");
+        sidebarBackdrop.classList.toggle("show", isOpen);
+        mobileMenu.setAttribute("aria-expanded", String(isOpen));
+      });
+      sidebarBackdrop.addEventListener("click", closeSidebar);
+
+      setMode("coding");
+      setStatus("", "Ready to connect");
+    })();
   </script>
 </body>
 </html>
